@@ -52,10 +52,22 @@ namespace Lab1.Controllers
         {
             return View();
         }
-        public IActionResult search(string Buscar, string Busqueda)
+        public IActionResult search(string Buscar, string Busqueda, string salary)
         {
+
+            int cont = 0;
+           
+            foreach(var item in Singleton.Instance.JugadoresBuscados)
+                {
+                cont++;
+            }
+            for (int i = 0; i < cont; i++)
+            {
+                Singleton.Instance.JugadoresBuscados.RemoveAt(0);
+            }
+
             int opcion = Convert.ToInt32(Buscar);
-            if(Singleton.Instance.L==0)
+            if (Singleton.Instance.L==0)
             {
                 switch(opcion)
                 {
@@ -85,18 +97,132 @@ namespace Lab1.Controllers
 
 
                     case 2://Búsqueda por Salario
+                        int M = Convert.ToInt32(salary);
+                        double saliocomparer = Convert.ToDouble(Busqueda);
+
+                        for (int i = 0; i < Singleton.Instance.JugadoresGeneric.Cantidad; i++)
+                        {
+                            double Salario = Singleton.Instance.JugadoresGeneric.ObtenerPos(i).Data.Salary;
+                            switch (M)
+                            {
+                                case 0://buscar menores a 
+                                    if (saliocomparer >= Salario)
+                                    {
+                                        Jugadores Buscado = Singleton.Instance.JugadoresGeneric.ObtenerPos(i).Data;
+                                        Singleton.Instance.JugadoresBuscados.Add(Buscado);
+                                    }
+                                    break;
+                                case 1://buscar iguales a
+                                    if (Salario == saliocomparer)
+                                    {
+                                        Jugadores Buscado = Singleton.Instance.JugadoresGeneric.ObtenerPos(i).Data;
+                                        Singleton.Instance.JugadoresBuscados.Add(Buscado);
+                                    }
+                                    break;
+                                case 2://buscar mayoresa 
+                                    if (Salario >= saliocomparer)
+                                    {
+                                        Jugadores Buscado = Singleton.Instance.JugadoresGeneric.ObtenerPos(i).Data;
+                                        Singleton.Instance.JugadoresBuscados.Add(Buscado);
+                                    }
+                                    break;
+                            }
+
+                        }
+
                         break;
 
 
                     case3://salario por Club
+                        for (int i = 0; i < Singleton.Instance.JugadoresGeneric.Cantidad; i++)
+                        {
+                            string Club = Singleton.Instance.JugadoresGeneric.ObtenerPos(i).Data.Club;
+                            if (Club == Busqueda)
+                            {
+                                Jugadores Buscado = Singleton.Instance.JugadoresGeneric.ObtenerPos(i).Data;
+                                Singleton.Instance.JugadoresBuscados.Add(Buscado);
+                            }
+                        }
+                        break;
+                }            
+            }
+            else
+            {
+                switch (opcion)
+                {
+                    case 0://Busqueda por nombre y apellido
+                        for (int i = 0; i < Singleton.Instance.JugadoresList.Count; i++)
+                        {
+                            string NombreyApellido = Singleton.Instance.JugadoresList[i].Name + " " + Singleton.Instance.JugadoresList[i].Lastname;
+                            if (NombreyApellido == Busqueda)
+                            {
+                                Jugadores Buscado = Singleton.Instance.JugadoresList[i];
+                                Singleton.Instance.JugadoresBuscados.Add(Buscado);
+                            }
+                        }
+                        break;
+
+                    case 1://Búsqueda por Posición
+                        for (int i = 0; i < Singleton.Instance.JugadoresList.Count; i++)
+                        {
+                            string Posicion = Singleton.Instance.JugadoresList[i].Position;
+                            if (Posicion == Busqueda)
+                            {
+                                Jugadores Buscado = Singleton.Instance.JugadoresList[i];
+                                Singleton.Instance.JugadoresBuscados.Add(Buscado);
+                            }
+                        }
                         break;
 
 
+                    case 2://Búsqueda por Salario
+                        int M = Convert.ToInt32(salary);
+                        double saliocomparer = Convert.ToDouble(Busqueda);
+
+                        for (int i = 0; i < Singleton.Instance.JugadoresList.Count; i++)
+                        {
+                            double Salario = Singleton.Instance.JugadoresList[i].Salary;
+                            switch (M)
+                            {
+                                case 0://buscar menores a 
+                                    if (saliocomparer >= Salario )
+                                    {
+                                        Jugadores Buscado = Singleton.Instance.JugadoresList[i];
+                                        Singleton.Instance.JugadoresBuscados.Add(Buscado);
+                                    }
+                                    break;
+                                case 1://buscar iguales a
+                                    if (Salario == saliocomparer)
+                                    {
+                                        Jugadores Buscado = Singleton.Instance.JugadoresList[i];
+                                        Singleton.Instance.JugadoresBuscados.Add(Buscado);
+                                    }
+                                    break;
+                                case 2://buscar mayoresa 
+                                    if (Salario >= saliocomparer)
+                                    {
+                                        Jugadores Buscado = Singleton.Instance.JugadoresList[i];
+                                        Singleton.Instance.JugadoresBuscados.Add(Buscado);
+                                    }
+                                    break;
+                            }
+
+                        }
+                        break;
+
+
+                    case3://salario por Club
+                        for (int i = 0; i < Singleton.Instance.JugadoresList.Count; i++)
+                        {
+                            string Club = Singleton.Instance.JugadoresList[i].Club;
+                            if (Club == Busqueda)
+                            {
+                                Jugadores Buscado = Singleton.Instance.JugadoresList[i];
+                                Singleton.Instance.JugadoresBuscados.Add(Buscado);
+                            }
+                        }
+                        break;
                 }
-               
-                    
-                
-               
             }
             
             return View(Singleton.Instance.JugadoresBuscados);
@@ -315,5 +441,18 @@ namespace Lab1.Controllers
             }
             return cont;
         }
+        public IActionResult regresar()
+        {
+            if (Singleton.Instance.L == 0)
+            {
+                return Redirect("Index1");
+            }
+            else
+            {
+                return Redirect("Index");
+            }
+
+        }
+
     }
 }
