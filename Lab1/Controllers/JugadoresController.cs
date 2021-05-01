@@ -1,33 +1,109 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using System.Data;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Routing;
 using Lab1.Models.Data;
+using Lab1.Models;
+
 
 namespace Lab1.Controllers
 {
     public class JugadoresController : Controller
     {
-        // GET: JugadoresController
-       
-        public ActionResult Index()
+        //Cargar archivo CSV
+        private IHostingEnvironment Environment;
+        public JugadoresController(IHostingEnvironment _environment)
         {
-            return View(Singleton.Instance.JugadoresList);
+            Environment = _environment;
         }
+        // GET: JugadoresController
+
+        public ActionResult Index()
+        {                 
+                return View(Singleton.Instance.JugadoresList);                       
+        }
+
 
         // GET: JugadoresController/Details/5
         public ActionResult Details(int id)
         {
-            var ViewJugadores = Singleton.Instance.JugadoresList.Find(x => x.Id == id);
-            return View(ViewJugadores);
+            Jugadores ViewJugadores;
+            if (Singleton.Instance.L==0)
+            {
+                ViewJugadores = Singleton.Instance.JugadoresGeneric.ObtenerPos(devolverpos(id)).Data;
+                return View(ViewJugadores);
+            }
+            else
+            {
+                ViewJugadores = Singleton.Instance.JugadoresList.Find(x => x.Id == id);
+                return View(ViewJugadores);
+            }
+             
         }
 
         // GET: JugadoresController/Create
         public ActionResult Create()
         {
             return View();
+        }
+        public IActionResult search(string Buscar, string Busqueda)
+        {
+            int opcion = Convert.ToInt32(Buscar);
+            if(Singleton.Instance.L==0)
+            {
+                switch(opcion)
+                {
+                    case 0://Busqueda por nombre y apellido
+                        for (int i = 0; i < Singleton.Instance.JugadoresGeneric.Cantidad; i++)
+                        {
+                            string NombreyApellido = Singleton.Instance.JugadoresGeneric.ObtenerPos(i).Data.Name + " " + Singleton.Instance.JugadoresGeneric.ObtenerPos(i).Data.Lastname;
+                            if (NombreyApellido == Busqueda)
+                            {
+                                Jugadores Buscado = Singleton.Instance.JugadoresGeneric.ObtenerPos(i).Data;
+                                Singleton.Instance.JugadoresBuscados.Add(Buscado);
+                            }
+                        }
+                    break;
+
+                    case 1://Búsqueda por Posición
+                        for (int i = 0; i < Singleton.Instance.JugadoresGeneric.Cantidad; i++)
+                        {
+                            string Posicion = Singleton.Instance.JugadoresGeneric.ObtenerPos(i).Data.Position;
+                            if (Posicion == Busqueda)
+                            {
+                                Jugadores Buscado = Singleton.Instance.JugadoresGeneric.ObtenerPos(i).Data;
+                                Singleton.Instance.JugadoresBuscados.Add(Buscado);
+                            }
+                        }
+                        break;
+
+
+                    case 2://Búsqueda por Salario
+                        break;
+
+
+                    case3://salario por Club
+                        break;
+
+
+                }
+               
+                    
+                
+               
+            }
+            
+            return View(Singleton.Instance.JugadoresBuscados);
+        }
+        public ActionResult Index1()
+        {
+            return View(Singleton.Instance.JugadoresGeneric);
         }
 
         // POST: JugadoresController/Create
@@ -37,18 +113,19 @@ namespace Lab1.Controllers
         {
             try
             {
-                var newJugadores = new Models.Jugadores
+                Jugadores newJugadores = new Jugadores(Convert.ToInt32(collection["Id"]), collection["Name"], collection["Lastname"], collection["Club"], collection["Position"], Convert.ToDouble(collection["Salary"]), Convert.ToDouble(collection["Compensation"]));
+                
+                if (Singleton.Instance.L == 0) //En que lista agregar
                 {
-                    Id = Convert.ToInt32(collection["Id"]),
-                    Name = collection["Name"],
-                    Lastname = collection["Lastname"],
-                    Club = collection["Club"],
-                    Position = collection["Position"],
-                    Salary = Convert.ToDouble(collection["Salary"]),
-                    Compensation = Convert.ToDouble(collection["Compensation"])
-                };
-                Singleton.Instance.JugadoresList.Add(newJugadores);
-                return RedirectToAction(nameof(Index));
+                    Singleton.Instance.JugadoresGeneric.AgregarPos(Convert.ToInt32(collection["Id"]), newJugadores);
+                    return RedirectToAction(nameof(Index1));
+                }
+                else
+                {
+                    Singleton.Instance.JugadoresList.Add(newJugadores);
+                    return RedirectToAction(nameof(Index));
+                }
+               
             }
             catch
             {
@@ -82,9 +159,20 @@ namespace Lab1.Controllers
         // GET: JugadoresController/Delete/5
         public ActionResult Delete(int id)
         {
-            var deleteJugadores = Singleton.Instance.JugadoresList.Find(x => x.Id == id);
+            Jugadores deleteJugadores;
+            if (Singleton.Instance.L==0)
+            {
+                deleteJugadores = Singleton.Instance.JugadoresGeneric.ObtenerPos(devolverpos(id)).Data;
+                return View(deleteJugadores);
+            }
+
+            else
+            {
+                deleteJugadores = Singleton.Instance.JugadoresList.Find(x => x.Id == id);
+                return View(deleteJugadores);
+            }
+
             
-            return View(deleteJugadores);
         }
 
         // POST: JugadoresController/Delete/5
@@ -94,14 +182,138 @@ namespace Lab1.Controllers
         {
             try
             {
-                var deleteJugadores = Singleton.Instance.JugadoresList.Find(x => x.Id == id);
-                Singleton.Instance.JugadoresList.Remove(deleteJugadores);
-                return RedirectToAction(nameof(Index));
+                if(Singleton.Instance.L==0)
+                {
+                    Singleton.Instance.JugadoresGeneric.Eliminarpos(devolverpos(id));
+                    return RedirectToAction(nameof(Index1));
+                }
+                else
+                {
+                    var deleteJugadores = Singleton.Instance.JugadoresList.Find(x => x.Id == id);
+                    Singleton.Instance.JugadoresList.Remove(deleteJugadores);
+                    return RedirectToAction(nameof(Index));
+                }
+              
             }
             catch
             {
                 return View();
             }
+        }
+
+        //Cargar csv
+        public IActionResult loading(IFormFile postedFile)
+        {
+            
+            if (postedFile != null)
+            {
+                string path = Path.Combine(this.Environment.WebRootPath, "Uploads");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+
+                string fileName = Path.GetFileName(postedFile.FileName);
+                string filePath = Path.Combine(path, fileName);
+                using (FileStream stream = new FileStream(filePath, FileMode.Create))
+                {
+                    postedFile.CopyTo(stream);
+                }
+                string csvData = System.IO.File.ReadAllText(filePath);
+                DataTable dt = new DataTable();
+                bool firstRow = true;
+                foreach (string row in csvData.Split('\n'))
+                {
+                    if (!string.IsNullOrEmpty(row))
+                    {
+                        if (!string.IsNullOrEmpty(row))
+                        {
+                            if (firstRow)
+                            {
+
+                                foreach (string cell in row.Split(','))
+                                {
+
+                                    //dt.Columns.Add(cell.Trim());
+
+                                }
+
+                                firstRow = false;
+                            }
+                            else
+                            {
+                                //dt.Rows.Add();
+                                int i = 0;
+                                int cont = 0;
+                                string[] NodoM = new string[6] { "", "", "", "", "", ""};
+                                int encontrar = 0;
+                                string cell2 = "";
+                                foreach (string cell in row.Split(','))
+                                {
+                                    if (cell.Substring(0, 1) != "\"" && encontrar == 0)
+                                    {
+                                        //dt.Rows[dt.Rows.Count - 1][i] = cell.Trim();
+                                        NodoM[cont] = cell.Trim();
+                                        cell2 = "";
+                                        cont++;
+                                        i++;
+                                    }
+                                    else
+                                    {
+                                        cell2 = cell2 + cell + ","; encontrar++;
+                                        if (cell.Substring((cell.Length - 1), 1) == "\"")
+                                        {
+                                            encontrar = 0;
+                                            cell2 = cell2.Remove(0, 1);
+                                            cell2 = cell2.Remove(cell2.Length - 3, 3);
+                                            //dt.Rows[dt.Rows.Count - 1][i] = cell2.Trim();
+                                            NodoM[cont] = cell2.Trim();
+                                            cont++;
+                                            i++;
+                                            cell2 = "";
+                                        }
+
+                                    }
+                                }
+                                //llenar listas------------------------------------>
+                                Jugadores nuevoJugador = new Jugadores(Singleton.Instance.id, NodoM[2], NodoM[1], NodoM[0], NodoM[3], Convert.ToDouble(NodoM[4]), Convert.ToDouble(NodoM[5]));
+                                if(Singleton.Instance.L==0)//si es lista artesanal
+                                {
+                                    
+                                    Singleton.Instance.JugadoresGeneric.AgregarPos(Singleton.Instance.id, nuevoJugador);
+                                    
+                                }
+                                else //si es lista de c#
+                                {
+                                    Singleton.Instance.JugadoresList.Add(nuevoJugador);                                 
+                                }
+                                Singleton.Instance.id++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (Singleton.Instance.L == 0) { return Redirect("Index1"); } else { return Redirect("Index"); }
+        }
+        //metodo buscarposicion
+        public int devolverpos(int iD)
+        {
+            int position;
+            int cont = 0;
+            bool encontrado = false;
+            while (encontrado == false)
+            {
+                if (Singleton.Instance.JugadoresGeneric.ObtenerPos(cont).Data.Id == iD)
+                {
+                    return cont;
+                }
+                else
+                {
+                    cont++;
+                }                
+            }
+            return cont;
         }
     }
 }

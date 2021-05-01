@@ -1,0 +1,9 @@
+id,nombre,apellido,club,Posicion,salario,compensacion
+1,Jason,perez,FCB,D,1000,800
+2,Luis,sosa,FCB,D,2000,700
+3,Pedor,paz,FCB,A,3000,600
+4,Marcos,lopez,FCB,P,4000,500
+5,Maria,perez,FCR,P,5000,400
+6,Martina,del cid,RMD,C,6000,300
+7,Luis,contreras,RMD,C,7000,200
+8,Manzon,estrada,FB,P,8000,100

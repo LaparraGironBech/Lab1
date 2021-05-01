@@ -9,9 +9,16 @@ namespace Lab1.Models.Data
     {
         private readonly static Singleton _instance = new Singleton();
         public List<Jugadores> JugadoresList;
+        public List<Jugadores> JugadoresBuscados;
+        public ListaGenerics<Jugadores> JugadoresGeneric;
+        public int L;
+        public int id;
         private Singleton()
         {
             JugadoresList = new List<Jugadores>();
+            JugadoresBuscados = new List<Jugadores>();
+            JugadoresGeneric = new ListaGenerics<Jugadores>();
+            id = 1;
         }
 
         public static Singleton Instance
