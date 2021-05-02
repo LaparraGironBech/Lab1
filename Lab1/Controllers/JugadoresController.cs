@@ -263,6 +263,8 @@ namespace Lab1.Controllers
         public ActionResult Edit(int id)
         {
             var editJugadores = Singleton.Instance.JugadoresList.Find(x => x.Id == id);
+
+            Singleton.Instance.JugadoresList.Remove(editJugadores);
             return View(editJugadores);
         }
 
@@ -273,8 +275,20 @@ namespace Lab1.Controllers
         {
             try
             {
+                Jugadores newJugadores = new Jugadores(Convert.ToInt32(collection["Id"]), collection["Name"], collection["Lastname"], collection["Club"], collection["Position"], Convert.ToDouble(collection["Salary"]), Convert.ToDouble(collection["Compensation"]));
+
+                if (Singleton.Instance.L == 0) //En que lista agregar
+                {
+                    Singleton.Instance.JugadoresGeneric.AgregarPos(Convert.ToInt32(collection["Id"]), newJugadores);
+                    return RedirectToAction(nameof(Index1));
+                }
+                else
+                {
+                    Singleton.Instance.JugadoresList.Add(newJugadores);
+                    return RedirectToAction(nameof(Index));
+                }
+
                 
-                return RedirectToAction(nameof(Index));
             }
             catch
             {
