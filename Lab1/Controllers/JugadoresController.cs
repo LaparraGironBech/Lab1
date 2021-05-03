@@ -10,14 +10,23 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
 using Lab1.Models.Data;
 using Lab1.Models;
+using System.Diagnostics;
+using System.Text;
+
 
 
 namespace Lab1.Controllers
 {
+    
     public class JugadoresController : Controller
     {
+
+
+        string ejecuciones;
+
         //Cargar archivo CSV
         private IHostingEnvironment Environment;
+
         public JugadoresController(IHostingEnvironment _environment)
         {
             Environment = _environment;
@@ -33,15 +42,23 @@ namespace Lab1.Controllers
         // GET: JugadoresController/Details/5
         public ActionResult Details(int id)
         {
+            var watch = new Stopwatch();
+            watch.Start();
             Jugadores ViewJugadores;
             if (Singleton.Instance.L==0)
             {
                 ViewJugadores = Singleton.Instance.JugadoresGeneric.ObtenerPos(devolverpos(id)).Data;
+                watch.Stop();
+                var responseTimeForCompleteRequest = watch.Elapsed;
+                ejecuciones = ejecuciones + "Presionó Details y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
                 return View(ViewJugadores);
             }
             else
             {
                 ViewJugadores = Singleton.Instance.JugadoresList.Find(x => x.Id == id);
+                watch.Stop();
+                var responseTimeForCompleteRequest = watch.Elapsed;
+                ejecuciones = ejecuciones + "Presionó Details y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
                 return View(ViewJugadores);
             }
              
@@ -52,9 +69,26 @@ namespace Lab1.Controllers
         {
             return View();
         }
+
+        public ActionResult DownLoadFile()
+            
+        {
+            
+            MemoryStream memoryStream = new MemoryStream();
+            TextWriter tw = new StreamWriter(memoryStream);
+
+            tw.WriteLine(ejecuciones);
+            
+            tw.Flush();
+            tw.Close();
+
+            return File(memoryStream.GetBuffer(), "text/plain", "file.txt");
+        }
+        
         public IActionResult search(string Buscar, string Busqueda, string salary)
         {
-
+            var watch = new Stopwatch();
+            watch.Start();
             int cont = 0;
            
             foreach(var item in Singleton.Instance.JugadoresBuscados)
@@ -224,7 +258,9 @@ namespace Lab1.Controllers
                         break;
                 }
             }
-            
+            watch.Stop();
+            var responseTimeForCompleteRequest = watch.Elapsed;
+            ejecuciones = ejecuciones + "Realizó una busqueda y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
             return View(Singleton.Instance.JugadoresBuscados);
         }
         public ActionResult Index1()
@@ -237,6 +273,8 @@ namespace Lab1.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(IFormCollection collection)
         {
+            var watch = new Stopwatch();
+            watch.Start();
             try
             {
                 Jugadores newJugadores = new Jugadores(Convert.ToInt32(collection["Id"]), collection["Name"], collection["Lastname"], collection["Club"], collection["Position"], Convert.ToDouble(collection["Salary"]), Convert.ToDouble(collection["Compensation"]));
@@ -244,24 +282,36 @@ namespace Lab1.Controllers
                 if (Singleton.Instance.L == 0) //En que lista agregar
                 {
                     Singleton.Instance.JugadoresGeneric.AgregarPos(Convert.ToInt32(collection["Id"]), newJugadores);
+                    watch.Stop();
+                    var responseTimeForCompleteRequest = watch.Elapsed;
+                    ejecuciones = ejecuciones + "Presionó Create y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
                     return RedirectToAction(nameof(Index1));
                 }
                 else
                 {
                     Singleton.Instance.JugadoresList.Add(newJugadores);
+                    watch.Stop();
+                    var responseTimeForCompleteRequest = watch.Elapsed;
+                    ejecuciones =  ejecuciones + "Presionó Create y tomó" + Convert.ToString(responseTimeForCompleteRequest) + "milisegundos" + "/n";
                     return RedirectToAction(nameof(Index));
                 }
                
             }
+
             catch
             {
+                watch.Stop();
+                var responseTimeForCompleteRequest = watch.Elapsed;
+                ejecuciones = ejecuciones + "Presionó Create y tomó" + responseTimeForCompleteRequest + "milisegundos"+"/n";
                 return View();
             }
+            
         }
 
         // GET: JugadoresController/Edit/5
         public ActionResult Edit(int id)
         {
+
             var editJugadores = Singleton.Instance.JugadoresList.Find(x => x.Id == id);
 
             Singleton.Instance.JugadoresList.Remove(editJugadores);
@@ -273,18 +323,28 @@ namespace Lab1.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, IFormCollection collection)
         {
+            var watch = new Stopwatch();
+            watch.Start();
             try
             {
+                
                 Jugadores newJugadores = new Jugadores(Convert.ToInt32(collection["Id"]), collection["Name"], collection["Lastname"], collection["Club"], collection["Position"], Convert.ToDouble(collection["Salary"]), Convert.ToDouble(collection["Compensation"]));
 
                 if (Singleton.Instance.L == 0) //En que lista agregar
                 {
                     Singleton.Instance.JugadoresGeneric.AgregarPos(Convert.ToInt32(collection["Id"]), newJugadores);
+                    watch.Stop();
+                    var responseTimeForCompleteRequest = watch.Elapsed;
+                    ejecuciones = ejecuciones + "Presionó edit y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
                     return RedirectToAction(nameof(Index1));
                 }
                 else
                 {
                     Singleton.Instance.JugadoresList.Add(newJugadores);
+                    watch.Stop();
+                    var responseTimeForCompleteRequest = watch.Elapsed;
+                    ejecuciones = ejecuciones + "Presionó edit y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
+
                     return RedirectToAction(nameof(Index));
                 }
 
@@ -292,6 +352,9 @@ namespace Lab1.Controllers
             }
             catch
             {
+                watch.Stop();
+                var responseTimeForCompleteRequest = watch.Elapsed;
+                ejecuciones = ejecuciones + "Presionó edit y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
                 return View();
             }
         }
@@ -320,23 +383,34 @@ namespace Lab1.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
         {
+            var watch = new Stopwatch();
+            watch.Start();
             try
             {
                 if(Singleton.Instance.L==0)
                 {
                     Singleton.Instance.JugadoresGeneric.Eliminarpos(devolverpos(id));
+                    watch.Stop();
+                    var responseTimeForCompleteRequest = watch.Elapsed;
+                    ejecuciones = ejecuciones + "Presionó Delete y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
                     return RedirectToAction(nameof(Index1));
                 }
                 else
                 {
                     var deleteJugadores = Singleton.Instance.JugadoresList.Find(x => x.Id == id);
                     Singleton.Instance.JugadoresList.Remove(deleteJugadores);
+                    watch.Stop();
+                    var responseTimeForCompleteRequest = watch.Elapsed;
+                    ejecuciones = ejecuciones + "Presionó Delete y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
                     return RedirectToAction(nameof(Index));
                 }
               
             }
             catch
             {
+                watch.Stop();
+                var responseTimeForCompleteRequest = watch.Elapsed;
+                ejecuciones = ejecuciones + "Presionó Delete y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
                 return View();
             }
         }
@@ -344,7 +418,8 @@ namespace Lab1.Controllers
         //Cargar csv
         public IActionResult loading(IFormFile postedFile)
         {
-            
+            var watch = new Stopwatch();
+            watch.Start();
             if (postedFile != null)
             {
                 string path = Path.Combine(this.Environment.WebRootPath, "Uploads");
@@ -433,12 +508,15 @@ namespace Lab1.Controllers
                     }
                 }
             }
-
+            watch.Stop();
+            var responseTimeForCompleteRequest = watch.Elapsed;
+            ejecuciones = ejecuciones + "Presionó Cargar lista y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
             if (Singleton.Instance.L == 0) { return Redirect("Index1"); } else { return Redirect("Index"); }
         }
         //metodo buscarposicion
         public int devolverpos(int iD)
         {
+
             int position;
             int cont = 0;
             bool encontrado = false;
