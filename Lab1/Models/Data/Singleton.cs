@@ -13,7 +13,7 @@ namespace Lab1.Models.Data
         public ListaGenerics<Jugadores> JugadoresGeneric;
         public int L;
         public int id;
-        string ejecuciones;
+        public string ejecuciones;
         private Singleton()
         {
             JugadoresList = new List<Jugadores>();

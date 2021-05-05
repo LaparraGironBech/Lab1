@@ -22,7 +22,7 @@ namespace Lab1.Controllers
     {
 
 
-        string ejecuciones;
+       
 
         //Cargar archivo CSV
         private IHostingEnvironment Environment;
@@ -50,7 +50,7 @@ namespace Lab1.Controllers
                 ViewJugadores = Singleton.Instance.JugadoresGeneric.ObtenerPos(devolverpos(id)).Data;
                 watch.Stop();
                 var responseTimeForCompleteRequest = watch.Elapsed;
-                ejecuciones = ejecuciones + "Presionó Details y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
+                Singleton.Instance.ejecuciones = Singleton.Instance.ejecuciones + "Presionó Details y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
                 return View(ViewJugadores);
             }
             else
@@ -58,7 +58,7 @@ namespace Lab1.Controllers
                 ViewJugadores = Singleton.Instance.JugadoresList.Find(x => x.Id == id);
                 watch.Stop();
                 var responseTimeForCompleteRequest = watch.Elapsed;
-                ejecuciones = ejecuciones + "Presionó Details y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
+                Singleton.Instance.ejecuciones = Singleton.Instance.ejecuciones + "Presionó Details y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
                 return View(ViewJugadores);
             }
              
@@ -77,7 +77,7 @@ namespace Lab1.Controllers
             MemoryStream memoryStream = new MemoryStream();
             TextWriter tw = new StreamWriter(memoryStream);
 
-            tw.WriteLine(ejecuciones);
+            tw.WriteLine(Singleton.Instance.ejecuciones);
             
             tw.Flush();
             tw.Close();
@@ -260,7 +260,7 @@ namespace Lab1.Controllers
             }
             watch.Stop();
             var responseTimeForCompleteRequest = watch.Elapsed;
-            ejecuciones = ejecuciones + "Realizó una busqueda y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
+            Singleton.Instance.ejecuciones = Singleton.Instance.ejecuciones + "Realizó una busqueda y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
             return View(Singleton.Instance.JugadoresBuscados);
         }
         public ActionResult Index1()
@@ -284,7 +284,7 @@ namespace Lab1.Controllers
                     Singleton.Instance.JugadoresGeneric.AgregarPos(Convert.ToInt32(collection["Id"]), newJugadores);
                     watch.Stop();
                     var responseTimeForCompleteRequest = watch.Elapsed;
-                    ejecuciones = ejecuciones + "Presionó Create y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
+                    Singleton.Instance.ejecuciones = Singleton.Instance.ejecuciones + "   Presionó Create y tomó " + responseTimeForCompleteRequest + " milisegundos" + "   ";
                     return RedirectToAction(nameof(Index1));
                 }
                 else
@@ -292,7 +292,7 @@ namespace Lab1.Controllers
                     Singleton.Instance.JugadoresList.Add(newJugadores);
                     watch.Stop();
                     var responseTimeForCompleteRequest = watch.Elapsed;
-                    ejecuciones =  ejecuciones + "Presionó Create y tomó" + Convert.ToString(responseTimeForCompleteRequest) + "milisegundos" + "/n";
+                    Singleton.Instance.ejecuciones = Singleton.Instance.ejecuciones + "   Presionó Create y tomó " + responseTimeForCompleteRequest + " milisegundos" + "   ";
                     return RedirectToAction(nameof(Index));
                 }
                
@@ -302,7 +302,7 @@ namespace Lab1.Controllers
             {
                 watch.Stop();
                 var responseTimeForCompleteRequest = watch.Elapsed;
-                ejecuciones = ejecuciones + "Presionó Create y tomó" + responseTimeForCompleteRequest + "milisegundos"+"/n";
+                Singleton.Instance.ejecuciones = Singleton.Instance.ejecuciones + "   Presionó Create y tomó " + responseTimeForCompleteRequest + " milisegundos" + "   ";
                 return View();
             }
             
@@ -335,7 +335,7 @@ namespace Lab1.Controllers
                     Singleton.Instance.JugadoresGeneric.AgregarPos(Convert.ToInt32(collection["Id"]), newJugadores);
                     watch.Stop();
                     var responseTimeForCompleteRequest = watch.Elapsed;
-                    ejecuciones = ejecuciones + "Presionó edit y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
+                    Singleton.Instance.ejecuciones = Singleton.Instance.ejecuciones + "   Presionó edit y tomó " + responseTimeForCompleteRequest + " milisegundos" + "   ";
                     return RedirectToAction(nameof(Index1));
                 }
                 else
@@ -343,7 +343,7 @@ namespace Lab1.Controllers
                     Singleton.Instance.JugadoresList.Add(newJugadores);
                     watch.Stop();
                     var responseTimeForCompleteRequest = watch.Elapsed;
-                    ejecuciones = ejecuciones + "Presionó edit y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
+                    Singleton.Instance.ejecuciones = Singleton.Instance.ejecuciones + "   Presionó edit y tomó " + responseTimeForCompleteRequest + " milisegundos" + "   ";
 
                     return RedirectToAction(nameof(Index));
                 }
@@ -354,7 +354,7 @@ namespace Lab1.Controllers
             {
                 watch.Stop();
                 var responseTimeForCompleteRequest = watch.Elapsed;
-                ejecuciones = ejecuciones + "Presionó edit y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
+                Singleton.Instance.ejecuciones = Singleton.Instance.ejecuciones + "   Presionó edit y tomó " + responseTimeForCompleteRequest + " milisegundos" + "   ";
                 return View();
             }
         }
@@ -392,7 +392,7 @@ namespace Lab1.Controllers
                     Singleton.Instance.JugadoresGeneric.Eliminarpos(devolverpos(id));
                     watch.Stop();
                     var responseTimeForCompleteRequest = watch.Elapsed;
-                    ejecuciones = ejecuciones + "Presionó Delete y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
+                    Singleton.Instance.ejecuciones = Singleton.Instance.ejecuciones + "   Presionó Delete y tomó " + responseTimeForCompleteRequest + " milisegundos" + "   ";
                     return RedirectToAction(nameof(Index1));
                 }
                 else
@@ -401,7 +401,7 @@ namespace Lab1.Controllers
                     Singleton.Instance.JugadoresList.Remove(deleteJugadores);
                     watch.Stop();
                     var responseTimeForCompleteRequest = watch.Elapsed;
-                    ejecuciones = ejecuciones + "Presionó Delete y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
+                    Singleton.Instance.ejecuciones = Singleton.Instance.ejecuciones + "   Presionó Delete y tomó " + responseTimeForCompleteRequest + " milisegundos" + "   ";
                     return RedirectToAction(nameof(Index));
                 }
               
@@ -410,7 +410,7 @@ namespace Lab1.Controllers
             {
                 watch.Stop();
                 var responseTimeForCompleteRequest = watch.Elapsed;
-                ejecuciones = ejecuciones + "Presionó Delete y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
+                Singleton.Instance.ejecuciones = Singleton.Instance.ejecuciones + "   Presionó Delete y tomó " + responseTimeForCompleteRequest + " milisegundos" + "   ";
                 return View();
             }
         }
@@ -510,7 +510,8 @@ namespace Lab1.Controllers
             }
             watch.Stop();
             var responseTimeForCompleteRequest = watch.Elapsed;
-            ejecuciones = ejecuciones + "Presionó Cargar lista y tomó" + responseTimeForCompleteRequest + "milisegundos" + "/n";
+            Singleton.Instance.ejecuciones = Singleton.Instance.ejecuciones + "   Presionó Cargar lista y tomó " + responseTimeForCompleteRequest + " milisegundos" + "   ";
+            
             if (Singleton.Instance.L == 0) { return Redirect("Index1"); } else { return Redirect("Index"); }
         }
         //metodo buscarposicion
